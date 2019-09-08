@@ -15,21 +15,25 @@ const {handler} = require(indexPath)
 const port = process.argv[2] || 8080
 
 const safe = (middleware) => 
-  (req, res, next) => 
-    Promise.resolve(middleware(req, res, next)).catch(next)
+  (req, res, next) => Promise.resolve(middleware(req, res, next)).catch(next)
 
-stage.all('*', safe(async (req, res) => {
-  const event = toLambda(req)
-  const context = getMockedContext()
-
-  const response = await handler(event, context)
-
-  res.status(response.statusCode)
-  res.set(response.headers)
-  res.send(response.body)
-}))
-
+app.use(express.json())
 app.use(`/${stagePath}`, stage)
+
+handler.expressCompatibility.forEach((route) => {
+  stage[route.method](route.path, safe(async (req, res) => {
+    const event = toLambda(req, route.resource)
+    console.log(req.params)
+
+    const context = getMockedContext()
+
+    const response = await handler(event, context)
+
+    res.status(response.statusCode)
+    res.set(response.headers)
+    res.send(response.body)
+  }))
+})
 
 app.listen(port, () => {
   console.log('try your lambda/api gateway integration at:')

@@ -1,14 +1,9 @@
-const path = require('path')
-const pwd = process.env.PWD
-const packageJsonPath = path.join(pwd, 'package.json')
-const pkg = require(packageJsonPath)
-
 module.exports = () => ({
   getRemainingTimeInMillis: () => {
     return 999999
   },
-  functionName: pkg.name,
-  functionVersion: pkg.version,
+  functionName: '',
+  functionVersion: '',
   invokedFunctionArn: '',
   memoryLimitInMB: '',
   awsRequestId: '',

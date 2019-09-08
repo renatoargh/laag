@@ -3,27 +3,31 @@
 const capitalize = (string) => 
   string[0].toUpperCase() + string.slice(1)
 
-const toUpperCaseKeys = (obj) => {
-   return Object.entries(obj).reduce((newObject, [key, value]) => {
-     const upperCaseKey = key.split('-').map(segment => {
-       return capitalize(segment)
-     }).join('-')
-     
-     newObject[upperCaseKey] = value
-     return newObject
-   }, {})
-}
+const isOdd = (i) =>
+  i % 2 !== 0
 
-module.exports = (req) => {
+const parseRawHeaders = (rawHeaders) => 
+  rawHeaders.reduce((headers, value, index, array) => {
+    if (isOdd(index)) {
+      return headers
+    }
+
+    headers[value] = array[index + 1]
+
+    return headers
+  }, {})
+
+module.exports = (req, resource) => {
   return {
     isBase64Encoded: false,
     httpMethod: req.method,
     headers: Object.assign({
       'X-Forwarded-Proto': req.protocol,
-    }, toUpperCaseKeys(req.headers)),
-    resource: req.path,
+    }, parseRawHeaders(req.rawHeaders)),
+    resource: resource,
     pathParameters: req.params,
     queryStringParameters: req.query,
+    body: JSON.stringify(req.body),
     requestContext: {
       stage: process.env.NODE_ENV
     }
