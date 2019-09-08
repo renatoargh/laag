@@ -29,7 +29,9 @@ module.exports = (req, resource) => {
     queryStringParameters: req.query,
     body: JSON.stringify(req.body),
     requestContext: {
-      stage: process.env.NODE_ENV
+      stage: process.env.NODE_ENV,
+      domainName: req.headers['host'],
+      apiId: 'cfzx02oz87'
     }
   }
 }
