@@ -1,6 +1,6 @@
 {
   "name": "laag",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Lambda/Api Gateway offline development tool",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,11 @@
   },
   "homepage": "https://github.com/renatoargh/laag#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "get-port": "^5.0.0",
+    "morgan": "^1.9.1"
   },
   "devDependencies": {
-    "lambida": "^1.0.2"
+    "lambida": "^1.0.4"
   }
 }
