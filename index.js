@@ -21,7 +21,7 @@ let handlersPaths = [path.join(pwd, 'index.js')]
 if (isMulti) {
   handlersPaths = fs
     .readdirSync(pwd, {withFileTypes: true})
-    .filter(d => d.isDirectory() && d.name !== 'node_modeules')
+    .filter(d => d.isDirectory() && d.name !== 'node_modules')
     .map(d => path.join(pwd, `/${d.name}`, 'index.js'))
 }
 
