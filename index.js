@@ -39,7 +39,7 @@ app.all('/', (req, res) => {
 console.log(`> ${pkg.name} - ${pkg.description}\n`)
 
 handlersPaths.forEach(handlerPath => {
-  console.log('>', path.dirname(handlerPath.replace(pwd, '')).replace(/^\//, ''))
+  console.log('>', path.dirname(handlerPath.replace(pwd, '')).replace(/^\//, '') || 'index.js')
 
   try {
     const {handler} = require(handlerPath)
