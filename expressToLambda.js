@@ -27,6 +27,7 @@ const extractJwtPayload = auth => {
 
 module.exports = (req, resource) => {
   const auth = req.headers['Authorization'] || req.headers['authorization'];
+
   let authorizer = null;
 
   if (auth && isJwt(auth)) {

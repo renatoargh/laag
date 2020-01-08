@@ -1,6 +1,6 @@
 {
   "name": "laag",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Lambda/Api Gateway offline development tool",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/renatoargh/laag.git"
   },
+  "types": "./types.d.ts",
   "bin": {
-    "laag": "./index.js"
+    "laag": "./cli.js"
   },
   "author": "Renato Gama <renato@renatogama.com>",
   "license": "MIT",
@@ -24,6 +25,7 @@
     "express": "^4.17.1",
     "get-port": "^5.0.0",
     "morgan": "^1.9.1",
+    "source-map-support": "^0.5.16",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
