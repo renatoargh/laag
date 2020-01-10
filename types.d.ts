@@ -9,6 +9,8 @@ declare module 'laag' {
     includeFiles?: Array<string>;
     isMultiFolders?: boolean;
     stagePath?: string;
+    log?: (text: string) => void;
+    logRequests: boolean;
   }
 
   export function init(path: string, params?: Params): Promise<OfflineServer>;

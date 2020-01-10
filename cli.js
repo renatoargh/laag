@@ -18,6 +18,8 @@ async function main() {
     includeFiles,
     stagePath,
     isMultiFolders,
+    log: text => console.log(text),
+    logRequests: true,
   });
 
   process.on('SIGINT', function() {

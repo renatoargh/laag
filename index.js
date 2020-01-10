@@ -12,7 +12,13 @@ const path = require('path');
 
 async function init(
   basePath,
-  { includeFiles = [], isMultiFolders = false, stagePath = 'dev' } = {}
+  {
+    includeFiles = [],
+    isMultiFolders = false,
+    stagePath = 'dev',
+    log = () => {},
+    logRequests = false,
+  } = {}
 ) {
   assert(basePath, 'basePath is required');
 
@@ -42,7 +48,10 @@ async function init(
   const safe = middleware => (req, res, next) =>
     Promise.resolve(middleware(req, res, next)).catch(next);
 
-  app.use(morgan('tiny'));
+  if (logRequests) {
+    app.use(morgan('tiny'));
+  }
+
   app.use(express.json());
   app.use(`/${stagePath}`, stage);
 
@@ -60,7 +69,7 @@ async function init(
         path.dirname(handlerPath.replace(basePath, '')).replace(/^\//, '') || 'index.js';
 
       handler.expressCompatibility.forEach(route => {
-        console.log(`[${handlerName}] ${route.method.toUpperCase()} ${route.path}`);
+        log(`[${handlerName}] ${route.method.toUpperCase()} ${route.path}`);
 
         stage[route.method](
           route.path,
@@ -77,8 +86,8 @@ async function init(
       });
     } catch (err) {
       if (err.code !== 'MODULE_NOT_FOUND') {
-        console.log('> error:', err.message, '(skipping)');
-        console.log(err.stack);
+        log('> error:', err.message, '(skipping)');
+        log(err.stack);
       }
     }
   });
@@ -99,7 +108,7 @@ async function init(
 
   return new Promise(resolve => {
     const server = app.listen(port, () => {
-      console.log(`> server available at: ${url}\n`);
+      log(`> server available at: ${url}\n`);
 
       function stop() {
         return new Promise((resolve, reject) => {

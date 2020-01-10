@@ -1,6 +1,6 @@
 {
   "name": "laag",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Lambda/Api Gateway offline development tool",
   "main": "index.js",
   "scripts": {
