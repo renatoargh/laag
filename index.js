@@ -68,11 +68,19 @@ async function init(
       const handlerName =
         path.dirname(handlerPath.replace(basePath, '')).replace(/^\//, '') || 'index.js';
 
-      handler.expressCompatibility.forEach(route => {
-        log(`[${handlerName}] ${route.method.toUpperCase()} ${route.path}`);
+      if (!handler.lambida) {
+        throw new Error('Lambida not exported');
+      }
 
-        stage[route.method](
-          route.path,
+      handler.lambida.routes.forEach(route => {
+        log(`[${handlerName}] ${route.method.toUpperCase()} ${route.resource}`);
+
+        const expressPath = route.resource.replace(/\{(.*?)\}/g, function(fullMatch, param) {
+          return `:${param}`;
+        });
+
+        stage[route.method.toLowerCase()](
+          expressPath,
           safe(async (req, res) => {
             const event = toLambda(req, route.resource);
             const context = getMockedContext();
