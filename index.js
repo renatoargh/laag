@@ -45,6 +45,10 @@ async function init(
     );
   }
 
+  const methodOrdering = {
+    'head': 1000,
+  }
+
   const safe = middleware => (req, res, next) =>
     Promise.resolve(middleware(req, res, next)).catch(next);
 
@@ -58,6 +62,8 @@ async function init(
   app.all('/', (req, res) => {
     res.redirect(`/${stagePath}`);
   });
+
+  const routesToRegister = []
 
   let successfulHandlers = 0;
   handlersPaths.forEach(handlerPath => {
@@ -73,24 +79,8 @@ async function init(
       }
 
       handler.lambida.routes.forEach(route => {
-        log(`[${handlerName}] ${route.method.toUpperCase()} ${route.resource}`);
-
-        const expressPath = route.resource.replace(/\{(.*?)\}/g, function(fullMatch, param) {
-          return `:${param}`;
-        });
-
-        stage[route.method.toLowerCase()](
-          expressPath,
-          safe(async (req, res) => {
-            const event = toLambda(req, route.resource);
-            const context = getMockedContext();
-            const response = await handler(event, context);
-
-            res.status(response.statusCode);
-            res.set(response.headers);
-            res.send(response.body);
-          })
-        );
+        route._handler = handler
+        routesToRegister.push(route)
       });
     } catch (err) {
       if (err.code !== 'MODULE_NOT_FOUND') {
@@ -99,6 +89,36 @@ async function init(
       }
     }
   });
+
+  routesToRegister.sort((routeA, routeB) => {
+    if (!routeA || !routeB) {
+      return 0
+    }
+
+    const orderingA = methodOrdering[routeA.method.toLowerCase()] || 0
+    const orderingB = methodOrdering[routeB.method.toLowerCase()] || 0
+
+    return orderingB - orderingA
+  }).forEach((route) => {
+    log(`${route.method.toUpperCase()} ${route.resource}`);
+
+    const expressPath = route.resource.replace(/\{(.*?)\}/g, function(fullMatch, param) {
+      return `:${param}`;
+    });
+
+    stage[route.method.toLowerCase()](
+      expressPath,
+      safe(async (req, res) => {
+        const event = toLambda(req, route.resource);
+        const context = getMockedContext();
+        const response = await route._handler(event, context);
+
+        res.status(response.statusCode);
+        res.set(response.headers);
+        res.send(response.body);
+      })
+    );
+  })
 
   if (!successfulHandlers) {
     const pathsEvaluated = handlersPaths.map(p => `"${p}"`).join(', ');
